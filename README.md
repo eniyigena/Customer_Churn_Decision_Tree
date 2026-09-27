@@ -187,11 +187,3 @@ This snippet defines the estimator only; data preparation, fitting, and evaluati
 - **Business impact has not been measured.** A retention pilot should evaluate whether targeting predicted churners leads to incremental retention and positive net value.
 
 Priority improvements are to rerun the analysis in a recorded environment, export the recommended model's confusion matrix, introduce an independent model-selection design, and evaluate retention outcomes before making deployment claims.
-
-## Contributors and attribution
-
-Completed for **ISOM 672: Introduction to Business Analytics — HW 1 Part B**, dated **September 11, 2026**.
-
-**Group 3:** Eric Niyigena, Michael Ekerue, Yining Yan, and Xiaoya Wang.
-
-The report credits a professor-provided Python decision tree example. This README summarizes the group report, *Intro to BA HW 1 Part B_Group 3.pdf*, with Python results drawn from Part I, Tables 1 and 2, and RapidMiner results from Part II's final comparison table.
