@@ -1,8 +1,8 @@
 # Customer Churn Prediction with Decision Trees
 
-A business analytics project using Python and RapidMiner to predict customer contract termination and evaluate the trade-off between identifying churners and unnecessary retention outreach.
+This a business analytics project using Python and RapidMiner to predict customer contract termination and evaluate the trade-off between identifying churners and unnecessary retention outreach.
 
-**Recommended Python model:** Entropy-based decision tree with `max_depth=5` — **75.44% recall**, **64.39% F1-score**, and **58.66% accuracy** on the reported test split.
+I build an Entropy-based decision tree with `max_depth=5` — **75.44% recall**, **64.39% F1-score**, and **58.66% accuracy** on the reported test split.
 
 ## Business objective
 
@@ -21,7 +21,7 @@ The analysis compares five decision tree configurations and recommends a model u
 
 ## Dataset
 
-**Source:** `HW1_Data.csv`, supplied through the course website for ISOM 672: Introduction to Business Analytics.
+**Source:** `HW1_Data.csv`, we choose to use this name for simplicity.
 
 **Target:** `churndep` — `1` indicates churn; `0` indicates retention.
 
@@ -101,7 +101,7 @@ That trade-off supports Model 2 when identifying more at-risk customers is the p
 
 ### Baseline confusion matrix
 
-The report supplies the following counts for the **initial unrestricted entropy model in Part I, Table 1**. These are not the recommended model's confusion matrix.
+I found the following counts for the **initial unrestricted entropy model in Part I, Table 1**. These are not the recommended model's confusion matrix.
 
 | Actual outcome | Predicted retained (0) | Predicted churned (1) |
 | --- | ---: | ---: |
