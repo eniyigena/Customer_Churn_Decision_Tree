@@ -1,189 +1,102 @@
-# Customer Churn Prediction with Decision Trees
+# Customer Churn Prediction Using Decision Trees
 
-This a business analytics project using Python and RapidMiner to predict customer contract termination and evaluate the trade-off between identifying churners and unnecessary retention outreach.
+### Business Analytics | Machine Learning | Python | RapidMiner
 
-I build an Entropy-based decision tree with `max_depth=5` — **75.44% recall**, **64.39% F1-score**, and **58.66% accuracy** on the reported test split.
+## Project Overview
 
-## Business objective
+In this project, I applied decision tree classification to predict customer churn using historical customer data. My goal was to understand how customer behavior, account history, and service characteristics can help identify customers who are more likely to terminate their contracts.
 
-Customer churn creates a need to identify customers who may terminate their contracts. This project investigates whether customer usage, account history, equipment, and personal characteristics can support that prediction.
+Beyond building predictive models, I focused on evaluating their performance from a business perspective, particularly the trade-off between identifying customers at risk of leaving and unnecessarily targeting customers who are likely to stay.
 
-The analysis compares five decision tree configurations and recommends a model under the business assumption that missing an actual churner is more costly than flagging a customer who would stay. This is an academic modeling study; financial returns and the effectiveness of retention interventions were not measured.
-
-## Project highlights
-
-- Analyzed **31,891 customer records** with **11 predictors** and one binary target.
-- Used a **75% training / 25% testing** split in Python.
-- Compared **entropy and Gini impurity**, with unlimited depth and depth limits of 5 or 10.
-- Evaluated accuracy, classification error, precision, recall, F1-score, and the baseline confusion matrix.
-- Recommended the depth-5 entropy tree for its higher churn recall and F1-score among the Python candidates.
-- Conducted a complementary workflow in RapidMiner, including data filtering and pruning experiments.
+I conducted the analysis primarily using **Python and RapidMiner**, comparing different decision tree configurations. I also explored model performance using **Altair** as an additional analytical tool to compare results with my Python analysis. The Altair work is not included in this repository.
 
 ## Dataset
 
-**Source:** `HW1_Data.csv`, we choose to use this name for simplicity.
+The analysis used a course-provided dataset containing **31,891 customer records**, 11 predictor variables, and one binary target variable (`churndep`), indicating whether a customer churned.
 
-**Target:** `churndep` — `1` indicates churn; `0` indicates retention.
+The predictors included:
 
-| Variable | Description |
-| --- | --- |
-| `revenue` | Mean monthly revenue in dollars |
-| `outcalls` | Mean number of outbound voice calls |
-| `incalls` | Mean number of inbound voice calls |
-| `months` | Months in service |
-| `eqpdays` | Number of days the customer has had the current equipment |
-| `webcap` | Whether the handset is web capable |
-| `marryyes` | Married: 1 = Yes, 0 = No |
-| `travel` | Has traveled to a non-US country: 1 = Yes, 0 = No |
-| `pcown` | Owns a personal computer: 1 = Yes, 0 = No |
-| `creditcd` | Possesses a credit card: 1 = Yes, 0 = No |
-| `retcalls` | Number of previous calls to the retention team |
-| `churndep` | Customer churn: 1 = Yes, 0 = No |
+- **Customer activity:** Monthly revenue, incoming and outgoing calls.
+- **Account and equipment history:** Months in service and equipment age.
+- **Customer characteristics:** Marital status, international travel, computer ownership, credit card ownership, and web-capable handset.
+- **Retention history:** Previous calls to the retention team.
 
-The reported class distribution was approximately **50.28% retained** and **49.72% churned**, making the dataset nearly balanced. The report records no missing values in the raw dataset.
+The dataset was nearly balanced, with approximately 49.72% of customers classified as churners and 50.28% as non-churners.
 
-The dataset is course-provided. Access and redistribution remain subject to the data owner's and course's permissions; this project does not grant rights to redistribute it.
+## Methodology
 
-## Python modeling process
+I followed a structured machine learning workflow:
 
-### 1. Explore the data
+1. **Data exploration:** Examined the dataset, checked for missing values, and reviewed descriptive statistics and class distribution.
+2. **Data preparation:** Separated predictors from the target variable and split the data into 75% training and 25% testing sets in Python.
+3. **Model development:** Built decision tree classifiers using entropy (information gain) and Gini impurity, experimenting with different maximum tree depths.
+4. **Model evaluation:** Compared accuracy, classification error, precision, recall, F1-score, and confusion matrices.
+5. **Cross-tool analysis:** Conducted additional experiments in RapidMiner, including filtering and pruning, and explored results using Altair.
+6. **Business interpretation:** Evaluated the models based on their ability to identify potential churners while considering the cost of unnecessary retention efforts.
 
-The analysis checked missing values, examined the target distribution, and reviewed descriptive statistics to understand the scale and distribution of the variables.
+## Model Performance
 
-### 2. Split predictors and target
+I compared five decision tree configurations in Python to understand how splitting criteria and tree depth affect predictive performance.
 
-The code shown in the report used the first 11 columns as predictors and the final column, `churndep`, as the target. It created:
+| Model | Criterion | Max Depth | Accuracy | Precision | Recall | F1-Score |
+|---|---|---|---|---|---|---|
+| Model 1 | Entropy | Unlimited | 53.74% | 53.53% | 52.63% | 53.08% |
+| **Model 2** | **Entropy** | **5** | **58.66%** | **56.16%** | **75.44%** | **64.39%** |
+| Model 3 | Entropy | 10 | 57.21% | 55.38% | 70.08% | 61.87% |
+| Model 4 | Gini | Unlimited | 53.66% | 53.26% | 52.73% | 53.00% |
+| Model 5 | Gini | 5 | 58.90% | 56.53% | 73.72% | 63.99% |
 
-| Partition | Records | Share |
-| --- | ---: | ---: |
-| Training | 23,918 | 75% |
-| Testing | 7,973 | 25% |
+### Key Findings
 
-The displayed split used `train_test_split(X, y, random_state=0)`, with the default test size and no explicit stratification argument. The displayed decision tree configurations used `random_state=42`.
+**1. Tree depth had a significant impact on performance.**
 
-### 3. Establish an unrestricted baseline
+The unrestricted decision trees performed relatively poorly on the test data, suggesting overfitting. Limiting tree depth improved generalization and produced more interpretable models.
 
-The initial model used entropy with `max_depth=None`. The report describes nearly perfect training accuracy but substantially weaker test performance and a tree too complex to interpret easily. This combination is consistent with overfitting.
+**2. The highest accuracy was not necessarily the best business choice.**
 
-### 4. Compare model configurations
+Although the depth-5 Gini model achieved the highest accuracy (58.90%), I selected the depth-5 entropy model because it achieved the highest recall (75.44%) and F1-score (64.39%) among the Python models.
 
-Five trees were compared on the test split by changing the splitting criterion and maximum depth. The report does not document a separate validation set or cross-validation; the results therefore represent an exploratory holdout comparison rather than an independent final evaluation after model selection.
+**3. Recall was particularly important for the business objective.**
 
-### 5. Recommend a model using business priorities
+The recommended model correctly identified approximately 75 out of every 100 customers who actually churned. However, its precision of 56.16% also indicated that some customers flagged as potential churners would not leave.
 
-The depth-5 entropy tree was recommended because it achieved the highest recall and F1-score among the Python candidates. The depth-5 Gini tree achieved slightly higher accuracy and precision.
+From a retention perspective, I considered this trade-off reasonable under the assumption that missing a potential churner could be more costly than contacting a customer who would otherwise stay.
 
-## Python results
+**4. Cross-tool comparisons reinforced the importance of model configuration.**
 
-The following values reproduce **Part I, Table 2** of the project report, expressed as percentages. Precision, recall, and F1 refer to churn (`1`) as the positive class.
+My RapidMiner experiments also showed that model depth, pruning, and evaluation settings influence classification results. The analysis highlighted why performance metrics and modeling assumptions need to be considered together rather than relying on a single accuracy score.
 
-| Model | Splitting criterion | Maximum depth | Accuracy | Error | Precision | Recall | F1-score |
-| --- | --- | --- | ---: | ---: | ---: | ---: | ---: |
-| 1 | Entropy | Unlimited | 53.74% | 46.26% | 53.53% | 52.63% | 53.08% |
-| **2 — recommended** | **Entropy** | **5** | **58.66%** | **41.34%** | **56.16%** | **75.44%** | **64.39%** |
-| 3 | Entropy | 10 | 57.21% | 42.79% | 55.38% | 70.08% | 61.87% |
-| 4 | Gini impurity | Unlimited | 53.66% | 46.34% | 53.26% | 52.73% | 53.00% |
-| 5 | Gini impurity | 5 | 58.90% | 41.10% | 56.53% | 73.72% | 63.99% |
+## Business Implications
 
-Limiting depth to 5 improved the reported results for both splitting criteria compared with their unlimited-depth counterparts. Within this experiment, controlling depth had a larger effect than choosing between entropy and Gini.
+This project reinforced my understanding that **building a predictive model is only part of solving a business problem. Selecting the right model also requires understanding the decisions its predictions will support.**
 
-### Why Model 2 was recommended
+For customer retention, a model with relatively high recall can help businesses identify more potentially at-risk customers and prioritize retention efforts.
 
-Compared with the depth-5 Gini tree, Model 2 delivered:
+However, predictive performance alone does not demonstrate financial value. Before using such a model in practice, a business would need to consider customer lifetime value, retention campaign costs, and whether interventions actually reduce churn.
 
-- **1.72 percentage points higher recall**.
-- **0.40 percentage points higher F1-score**.
-- **0.24 percentage points lower accuracy**.
+## Tools and Technologies
 
-A recall of 75.44% means the model identified approximately 75 of every 100 actual churners in the test data. A precision of 56.16% means approximately 56 of every 100 customers flagged as churners actually churned.
+- **Python:** pandas, NumPy, scikit-learn, Matplotlib
+- **RapidMiner:** Decision tree modeling, pruning, and performance evaluation
+- **Altair:** Additional exploratory analysis and comparison with Python results (not included in this repository)
+- **Jupyter Notebook:** Python implementation and experimentation
 
-That trade-off supports Model 2 when identifying more at-risk customers is the priority. It also means outreach would include many customers who would stay. A real retention team would need customer value, campaign costs, and intervention outcomes to decide whether that trade-off is economically worthwhile.
+## Limitations and Future Improvements
 
-### Baseline confusion matrix
+While the analysis provided useful insights into customer churn prediction, the models' predictive accuracy remained modest.
 
-I found the following counts for the **initial unrestricted entropy model in Part I, Table 1**. These are not the recommended model's confusion matrix.
+As a next step, I would explore cross-validation and hyperparameter tuning, compare decision trees with other classification algorithms such as random forests and logistic regression, and evaluate model performance using business-oriented cost metrics.
 
-| Actual outcome | Predicted retained (0) | Predicted churned (1) |
-| --- | ---: | ---: |
-| Retained (0) | 2,213 true negatives | 1,810 false positives |
-| Churned (1) | 1,890 false negatives | 2,060 true positives |
+I would also use a separate validation process for model selection and reserve an untouched test set for final evaluation.
 
-The counts total 7,973 observations and imply **53.59% accuracy**, **46.41% classification error**, **53.23% precision**, **52.15% recall**, and **52.69% F1-score**, matching the baseline metrics in Table 1 after rounding.
+## Conclusion
 
-**Reporting note:** Table 2 gives slightly different metrics for the same nominal unrestricted entropy configuration, including 53.74% accuracy. The report does not explain this discrepancy. The comparison table above preserves Table 2, while this confusion matrix preserves Table 1. Exact confusion-matrix counts for the recommended Python model were not provided and have not been inferred from rounded metrics.
+The main takeaway from this project was the importance of connecting machine learning performance with business objectives.
 
-## How performance was interpreted
+By comparing decision tree configurations and evaluating precision, recall, and F1-score, I learned how different modeling choices influence both predictive performance and potential business decisions.
 
-| Measure | Business interpretation |
-| --- | --- |
-| Accuracy | Share of all customers classified correctly |
-| Classification error | Share classified incorrectly; equal to 1 minus accuracy |
-| Precision | Among customers flagged as churners, the share who actually churned |
-| Recall | Among actual churners, the share successfully identified |
-| F1-score | Harmonic mean of precision and recall |
-| False positives | Customers flagged for possible outreach who did not churn |
-| False negatives | Actual churners the model missed |
+Although the models would require further improvement before practical deployment, this project helped strengthen my understanding of **classification modeling, model evaluation, overfitting, and business-driven decision-making**.
 
-Accuracy alone does not capture the different consequences of missed churners and unnecessary outreach. The recommendation therefore considered recall and F1 alongside accuracy and precision.
+---
 
-## Complementary RapidMiner analysis
-
-The RapidMiner workflow imported the same source dataset, assigned `churndep` as the binomial label, and filtered records to retain `revenue >= 0` and `eqpdays >= 0`. It then used split validation, a Decision Tree operator, Apply Model, and Performance (Binomial Classification).
-
-The experiments covered information gain, Gini impurity, depth limits, pruning, and an alternative 60/40 split. The report's final RapidMiner comparison table gives:
-
-| Model | Criterion | Maximum depth | Accuracy | Error | Precision | Recall | F1-score |
-| --- | --- | --- | ---: | ---: | ---: | ---: | ---: |
-| 1 | Information gain | Unlimited | 53.68% | 46.32% | 53.90% | 54.26% | 54.08% |
-| 2 | Information gain | 5 | 58.94% | 41.06% | 63.92% | 42.06% | 50.74% |
-| 3 | Information gain | 10 | 57.49% | 42.51% | 64.70% | 36.70% | 48.22% |
-| 4 | Gini impurity | Unlimited | 52.61% | 47.39% | 52.82% | 53.59% | 53.20% |
-| 5 | Gini impurity | 5 | 59.22% | 40.78% | 64.87% | 41.16% | 50.37% |
-
-These values are preserved as reported; class conventions and full operator settings should be checked before comparing them directly with Python. The RapidMiner filtering is not shown in the displayed Python workflow, and the post-filter record count is not documented.
-
-The report recommends Model 2 within the two depth-5 RapidMiner candidates. It has slightly higher recall and F1 than Model 5, but **does not have the highest F1 across all five RapidMiner models**: Model 1 does in the table above. The narrative also gives 58.94% accuracy for Model 3, whereas the final table gives 57.49%. This README uses the final comparison table without treating the conflicting narrative as verified.
-
-## Why decision trees?
-
-Decision trees express predictions through if–then rules that can be discussed with business stakeholders. They can represent nonlinear relationships and interactions among customer attributes. Limiting depth makes the resulting rules easier to inspect than a fully grown tree.
-
-Interpretability does not establish causality. A variable used in a split may help predict churn without being a cause of churn or a useful target for intervention.
-
-## Tools and reproduction notes
-
-The report documents a Python notebook workflow using **pandas, NumPy, scikit-learn, and Matplotlib**, alongside **RapidMiner**. Exact Python, package, and RapidMiner versions are not recorded, so an identical environment cannot be reconstructed from the report alone.
-
-To run the Python analysis when the project code is available:
-
-1. Obtain an authorized copy of `HW1_Data.csv`.
-2. Open the analysis notebook in a Python/Jupyter environment with the listed libraries installed.
-3. Place the CSV in the notebook's working directory, as expected by the displayed `pd.read_csv("HW1_Data.csv")` call, or update that path.
-4. Preserve the original column order: the displayed code selects predictors and target by position.
-5. Restart the kernel and run the notebook from top to bottom.
-6. Compare the outputs with the reported results, retaining the documented baseline discrepancy when interpreting differences.
-
-The recommended model's configuration shown in the report is:
-
-```python
-from sklearn.tree import DecisionTreeClassifier
-
-model = DecisionTreeClassifier(
-    criterion="entropy",
-    max_depth=5,
-    random_state=42,
-)
-```
-
-This snippet defines the estimator only; data preparation, fitting, and evaluation belong to the project analysis code. Results in this README were transcribed from the report, not independently reproduced from the dataset.
-
-## Limitations and next steps
-
-- **Model selection reused the test split.** Future work should select parameters within training data using validation or cross-validation, then evaluate the fixed model on an untouched test set.
-- **Predictive performance remains modest.** The recommended model's 58.66% accuracy is above the dataset's approximately 50% class proportions, but the project does not establish production readiness.
-- **Some reported results conflict.** The unrestricted Python baseline and parts of the RapidMiner analysis need reconciliation through a clean rerun.
-- **Cross-platform comparisons are not controlled.** Filtering, pruning, class conventions, and split behavior may differ between Python and RapidMiner.
-- **Data meaning and timing require verification.** Negative revenue should be investigated before assuming it is erroneous, and all predictors, particularly retention calls, must be available before the churn outcome being predicted.
-- **Business impact has not been measured.** A retention pilot should evaluate whether targeting predicted churners leads to incremental retention and positive net value.
-
-Priority improvements are to rerun the analysis in a recorded environment, export the recommended model's confusion matrix, introduce an independent model-selection design, and evaluate retention outcomes before making deployment claims.
+*This project was completed as part of my academic coursework in Business Analytics. The dataset was provided for educational purposes.*
